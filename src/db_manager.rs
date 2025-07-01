@@ -1,16 +1,19 @@
 use rusqlite::{Connection, Result};
-use crate::traits::{Trading, TradingResult};
+use crate::traits::Trading;
 use std::path::PathBuf;
-use crate::data_reader::get_account_info;
+use crate::data_reader::{DataReader, DataReaderType, make_data_reader};
 
-struct DBManager {
+pub struct DBManager {
     conn: Connection,
+    data_reader: Box<dyn DataReader>,
 }
 
 impl DBManager {
-    fn new(path: PathBuf) -> Result<Self> {
+    pub fn new(path: PathBuf, data_reader_type: DataReaderType) -> Result<Self> {
         let conn = Connection::open(path)?;
+        let data_reader = make_data_reader(data_reader_type);
 
+        // Create trading table
         conn.execute(
             "CREATE TABLE IF NOT EXISTS trading (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,6 +32,7 @@ impl DBManager {
             (),
         )?;
 
+        // Create overview table
         conn.execute(
             "CREATE TABLE IF NOT EXISTS overview (
                 date TEXT PRIMARY KEY,
@@ -45,20 +49,33 @@ impl DBManager {
             (),
         )?;
 
-        Ok(Self { conn })
+        Ok(Self { conn, data_reader })
     }
 
-    fn save_trading(&self, trading: Trading) -> Result<()> {
-        let trading_result = trading.to_trading_result();
-        todo!("save trading to db");
+    // Save trading data to database
+    pub fn save_trading(&self, trading: Trading) -> Result<()> {
+        let avg_price = self.data_reader.get_avg_price(trading.get_stockcode().to_string()).unwrap();
+        let trading_result = trading.to_trading_result(avg_price);
+        
+        // Insert trading data
+        self.conn.execute(
+            "INSERT INTO trading (
+                date, time, stockcode, buy_or_sell, quantity, 
+                price, fee, strategy, avg_price, profit, roi
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            trading_result.to_db_tuple(),
+        )?;
+
+        Ok(())
     }
 
     // Initialize today's overview data
-    fn insert_overview(&self) -> Result<()> {
-        let result = get_account_info().unwrap();
+    pub fn insert_overview(&self) -> Result<()> {
+        let result = self.data_reader.get_asset_info().unwrap();
         let date = result.get_date();
         let asset = result.get_asset();
 
+        // Insert overview data
         self.conn.execute(
             "INSERT INTO overview (date, open, high, low) VALUES (?, ?, ?, ?)",
             (date.date().to_string(), asset, asset, asset),
@@ -68,8 +85,8 @@ impl DBManager {
     }
 
     // Update today's overview data
-    fn update_overview(&self) -> Result<()> {
-        let result = get_account_info().unwrap();
+    pub fn update_overview(&self) -> Result<()> {
+        let result = self.data_reader.get_asset_info().unwrap();
         let date = result.get_date();
         let asset = result.get_asset();
 
@@ -97,8 +114,8 @@ impl DBManager {
     }
 
     // Finalize today's overview data
-    fn finish_overview(&self) -> Result<()> {
-        let result = get_account_info().unwrap();
+    pub fn finish_overview(&self) -> Result<()> {
+        let result = self.data_reader.get_asset_info().unwrap();
         let date = result.get_date();
         let asset = result.get_asset();
 
@@ -126,6 +143,7 @@ impl DBManager {
             |row| row.get(0),
         )?;
 
+        // Update with new values
         let fee = fee_sum.unwrap_or(0.0);
         let turnover = turnover_sum.unwrap_or(0.0);
 

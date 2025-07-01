@@ -1,19 +1,56 @@
-use crate::traits::Domestic006Result;
+use crate::traits::AssetInfo;
+use crate::api::koreainvestapi::get_domestic006_result;
+use crate::api::result::Domestic006Result;
 
-// 주식잔고조회[v1_국내주식-006]
+pub enum DataReaderType {
+    DB,
+    PAPER,
+    REAL,
+}
 
-// output1 Object Array
-//  pdno
-//  상품번호	String	Y	12	종목번호(뒷 6자리)
-//  pchs_avg_pric
-//  매입평균가격	String	Y	22	매입금액 / 보유수량
+pub trait DataReader {
+    fn get_asset_info(&self) -> Result<AssetInfo, Box<dyn std::error::Error>>;
+    fn get_avg_price(&self, stockcode: String) -> Result<f64, Box<dyn std::error::Error>>;
+}
 
-// output2 Object Array
-// dnca_tot_amt
-// 예수금총금액	String	Y	19	예수금
-//  nass_amt
-//  순자산금액	String	Y	19	
+pub struct RealDataReader;
+impl DataReader for RealDataReader {
+    fn get_asset_info(&self) -> Result<AssetInfo, Box<dyn std::error::Error>> {
+        let real: Domestic006Result = get_domestic006_result()?;
+        Ok(real.into())
+    }
+    fn get_avg_price(&self, stockcode: String) -> Result<f64, Box<dyn std::error::Error>> {
+        let result: Domestic006Result = get_domestic006_result()?;
+        let avg = result.get_pchs_avg_pric(stockcode)?;
+        Ok(avg)
+    }
+}
 
-pub fn get_account_info() -> Result<Domestic006Result, Box<dyn std::error::Error>> {
-    todo!("get account info");
+pub struct PaperDataReader;
+impl DataReader for PaperDataReader {
+    fn get_asset_info(&self) -> Result<AssetInfo, Box<dyn std::error::Error>> {
+        todo!("get asset info");
+    }
+    fn get_avg_price(&self, stockcode: String) -> Result<f64, Box<dyn std::error::Error>> {
+        todo!("get avg price");
+    }
+}
+pub struct DbDataReader;
+impl DataReader for DbDataReader {
+    fn get_asset_info(&self) -> Result<AssetInfo, Box<dyn std::error::Error>> {
+        todo!("get asset info");
+    }
+    fn get_avg_price(&self, stockcode: String) -> Result<f64, Box<dyn std::error::Error>> {
+        todo!("get avg price");
+    }
+}
+
+pub fn make_data_reader(
+    kind: DataReaderType,
+) -> Box<dyn DataReader> {
+    match kind {
+        DataReaderType::REAL => Box::new(RealDataReader),
+        DataReaderType::DB => Box::new(DbDataReader),
+        DataReaderType::PAPER => Box::new(PaperDataReader),
+    }
 }
