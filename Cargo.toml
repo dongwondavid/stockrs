@@ -6,3 +6,9 @@ edition = "2024"
 [dependencies]
 chrono = "0.4.41"
 rusqlite = { version = "0.36.0", features = ["bundled"] }
+korea-investment-api = { git = "https://github.com/dongwondavid/korea-investment-api", branch = "main" }
+clap = { version = "4.0", features = ["derive"] }
+thiserror = "1.0"
+xan-log = "0.1"
+toml = "0.8"
+tokio = { version = "1.0", features = ["full"] }

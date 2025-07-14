@@ -1,4 +1,4 @@
-use crate::traits::AssetInfo;
+use crate::trading::AssetInfo;
 use crate::api::koreainvestapi::get_domestic006_result;
 use crate::api::result::Domestic006Result;
 

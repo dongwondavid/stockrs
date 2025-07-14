@@ -1,5 +1,5 @@
 use rusqlite::{Connection, Result};
-use crate::traits::Trading;
+use crate::trading::Trading;
 use std::path::PathBuf;
 use crate::data_reader::{DataReader, DataReaderType, make_data_reader};
 

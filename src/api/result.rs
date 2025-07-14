@@ -1,5 +1,5 @@
 use chrono::NaiveDateTime;
-use crate::traits::AssetInfo;
+use crate::trading::AssetInfo;
 
 struct Domestic006Output1 {
     pdno: String,
