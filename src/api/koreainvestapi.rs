@@ -1,4 +1,5 @@
-use crate::types::api::Domestic006Result;
+use crate::types::api::{ApiEnv, Domestic006Result};
+use crate::types::broker::Order;
 
 
 
@@ -16,6 +17,18 @@ use crate::types::api::Domestic006Result;
 //  nass_amt
 //  순자산금액	String	Y	19	
 
-pub fn get_domestic006_result() -> Result<Domestic006Result, Box<dyn std::error::Error>> {
+pub fn get_domestic006_result(_env: ApiEnv) -> Result<Domestic006Result, Box<dyn std::error::Error>> {
     todo!("get domestic006 result");
+}
+
+pub fn execute_order(_order: &Order, _env: ApiEnv) -> Result<String, Box<dyn std::error::Error>> {
+    todo!("execute stock order");
+}
+
+pub fn check_fill(_order_id: &str, _env: ApiEnv) -> Result<bool, Box<dyn std::error::Error>> {
+    todo!("check order fill");
+}
+
+pub fn cancel_order(_order_id: &str, _env: ApiEnv) -> Result<(), Box<dyn std::error::Error>> {
+    todo!("cancel order");
 }
