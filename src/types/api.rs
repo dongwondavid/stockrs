@@ -1,6 +1,12 @@
 use chrono::NaiveDateTime;
 use crate::types::trading::AssetInfo;
 
+#[derive(Debug, Clone, Copy)]
+pub enum ApiEnv {
+    Real,
+    Paper,
+}
+
 struct Domestic006Output1 {
     pdno: String,
     pchs_avg_pric: String,
