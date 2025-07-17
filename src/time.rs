@@ -26,8 +26,10 @@ pub struct TimeService {
 }
 
 impl TimeService {
-    /// 새로운 `TimeService` 인스턴스를 생성하고,
-    /// 내부 시간을 로컬 시스템 시각으로 초기화합니다.
+    /// 새로운 `TimeService` 인스턴스를 생성합니다.
+    ///
+    /// 먼저 `Local::now()`로 현재 시각을 가져와 `current`를 설정한 뒤,
+    /// 다음 거래 이벤트를 계산하여 `current`와 `current_signal`을 갱신합니다.
     pub fn new() -> Self {
         let now = Local::now();
         let mut service = TimeService { 
