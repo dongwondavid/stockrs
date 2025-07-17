@@ -167,6 +167,7 @@ mod tests {
         let (next, sig) = service.compute_next_time();
         assert_eq!(sig, TimeSignal::DataPrep);
         assert_eq!(next.time().hour(), 8);
+        assert_eq!(next.time().minute(), 30);
 
         // 09:00 이후 -> 업데이트
         let now = c.with_ymd_and_hms(2025, 7, 16, 10, 0, 0).unwrap();
