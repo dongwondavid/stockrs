@@ -1,7 +1,7 @@
 use chrono::{Local, DateTime, Duration, NaiveTime, Datelike, Weekday, NaiveDate, TimeZone};
 use std::thread;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 /// Signals corresponding to specific time events within the trading day
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -107,8 +107,10 @@ fn is_weekend(date: NaiveDate) -> bool {
 
 /// 해당 연도의 공휴일 목록을 파일에서 로드
 fn load_holidays(year: i32) -> Vec<NaiveDate> {
-    let filename = format!("data/market_close_day_{}.txt", year);
-    let path = Path::new(&filename);
+    let manifest_dir = env!("CARGO_MANIFEST_DIR");
+    let path: PathBuf = Path::new(manifest_dir)
+        .join("data")
+        .join(format!("market_close_day_{}.txt", year));
     
     if !path.exists() {
         return Vec::new();
