@@ -1,4 +1,4 @@
-use crate::api::result::Domestic006Result;
+use crate::types::api::Domestic006Result;
 
 
 

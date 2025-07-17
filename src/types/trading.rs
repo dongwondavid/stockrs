@@ -29,10 +29,6 @@ pub struct AssetInfo {
     asset: f64,
 }
 
-
-
-
-
 /*
 ------------------- impl -------------------
 */
@@ -45,7 +41,6 @@ impl AssetInfo {
     pub fn get_date(&self) -> NaiveDateTime { self.date }
     pub fn get_asset(&self) -> f64 { self.asset }
 }
-
 
 impl Trading {
     pub fn new(date: NaiveDateTime, stockcode: String, buy_or_sell: bool, quantity: u32, price: f64, fee: f64, strategy: String) -> Self {
@@ -116,4 +111,4 @@ impl TradingResult {
             self.get_roi()
         )
     }
-}
+} 

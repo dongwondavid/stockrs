@@ -1,7 +1,7 @@
 use rusqlite::{Connection, Result};
-use crate::trading::Trading;
+use crate::types::trading::Trading;
 use std::path::PathBuf;
-use crate::data_reader::{DataReader, DataReaderType, make_data_reader};
+use crate::types::data_reader::{DataReader, DataReaderType, make_data_reader};
 
 pub struct DBManager {
     conn: Connection,
