@@ -1,7 +1,8 @@
-use chrono::{Local, DateTime, Duration, NaiveTime, Datelike, Weekday, NaiveDate, TimeZone};
+use chrono::{Local, DateTime, Duration, Datelike, Weekday, NaiveDate, TimeZone};
 use std::thread;
 use std::fs;
 use std::path::Path;
+use crate::local_time;
 
 /// Signals corresponding to specific time events within the trading day
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -45,6 +46,10 @@ impl TimeService {
         self.current
     }
 
+    pub fn now_signal(&self) -> TimeSignal {
+        self.current_signal
+    }
+
     /// 내부 시간(`current`)을 기준으로 다음 이벤트 시각과 시그널을 계산,
     /// 동시에 내부 시간을 그 다음 이벤트 시각으로 업데이트합니다.
     pub fn advance(&mut self) -> (DateTime<Local>, TimeSignal) {
@@ -74,10 +79,11 @@ impl TimeService {
     /// 5. Overnight - 다음 거래일 08:30 대기
     fn compute_next_time(&self) -> (DateTime<Local>, TimeSignal) {
         let today = self.current.date_naive();
-        let prep_time  = Local.from_local_datetime(&today.and_time(NaiveTime::from_hms_opt(8, 30, 0).unwrap())).unwrap();
-        let open_time  = Local.from_local_datetime(&today.and_time(NaiveTime::from_hms_opt(9, 0, 0).unwrap())).unwrap();
-        let last_upd   = Local.from_local_datetime(&today.and_time(NaiveTime::from_hms_opt(15, 29, 0).unwrap())).unwrap();
-        let close_time = Local.from_local_datetime(&today.and_time(NaiveTime::from_hms_opt(15, 30, 0).unwrap())).unwrap();
+
+        let prep_time = local_time!(today, 8, 30, 0);
+        let open_time  = local_time!(today, 9, 0, 0);
+        let last_upd   = local_time!(today, 15, 29, 0);
+        let close_time = local_time!(today, 15, 30, 0);
 
         if self.current < prep_time {
             (prep_time, TimeSignal::DataPrep)
@@ -90,7 +96,7 @@ impl TimeService {
             (close_time, TimeSignal::MarketClose)
         } else {
             let next_date = next_trading_day(today);
-            let next_datetime = Local.from_local_datetime(&next_date.and_time(NaiveTime::from_hms_opt(8, 30, 0).unwrap())).unwrap();
+            let next_datetime = local_time!(next_date, 8, 30, 0);
             (next_datetime, TimeSignal::Overnight)
         }
     }

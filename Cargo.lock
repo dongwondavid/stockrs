@@ -1164,7 +1164,7 @@ dependencies = [
 [[package]]
 name = "korea-investment-api"
 version = "1.6.3"
-source = "git+https://github.com/dongwondavid/korea-investment-api?branch=main#92e90b5bce6073b3dcd83a631908c6cf7e3a8aa7"
+source = "git+https://github.com/dongwondavid/korea-investment-api?branch=main#cf77b0febdeb7ebe70abb2cbe30060e79147f41e"
 dependencies = [
  "aes",
  "base64 0.21.7",
